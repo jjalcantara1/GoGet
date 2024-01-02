@@ -44,6 +44,13 @@
             {% endif %}
         </div>
         <div>
+            <label for="id_total_rooms">Total Rooms:</label>
+            {{ form.total_rooms }}
+            {% if form.total_rooms.errors %}
+                <div class="error">{{ form.total_rooms.errors }}</div>
+            {% endif %}
+        </div>
+        <div>
             <label for="id_image">Image:</label>
             {{ form.image }}
             {% if form.image.errors %}
