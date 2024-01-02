@@ -1,11 +1,12 @@
-from django.urls import path
-from . import views
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import HotelViewSet, RoomTypeViewSet, RoomViewSet
+
+router = DefaultRouter()
+router.register(r'hotels', HotelViewSet)
+router.register(r'roomtypes', RoomTypeViewSet)
+router.register(r'rooms', RoomViewSet)
 
 urlpatterns = [
-    path('admin-panel/', views.admin_panel, name='admin-panel'),
-    path('roomtypes/', views.RoomTypeList.as_view(), name='roomtype-list'),
-    path('rooms/', views.RoomList.as_view(), name='room-list'),
-    path('add-hotel/', views.add_hotel, name='add-hotel'),
-    path('add-room-type/', views.add_room_type, name='add-room-type'),
-    path('add-room/', views.add_room, name='add-room'),
+    path('', include(router.urls)),
 ]
