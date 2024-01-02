@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from rest_framework import generics
 from .models import RoomType, Room, Hotel
 from .serializers import RoomTypeSerializer, RoomSerializer
-from .forms import HotelForm, RoomTypeForm
+from .forms import HotelForm, RoomTypeForm, RoomForm
 
 
 class RoomTypeList(generics.ListAPIView):
@@ -34,7 +34,17 @@ def add_room_type(request):
         form = RoomTypeForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            return redirect('admin-panel')  # Assuming 'admin-panel' is the named URL pattern for your admin panel homepage
+            return redirect('admin-panel')
     else:
         form = RoomTypeForm()
     return render(request, 'add_room_type.html', {'form': form})
+
+def add_room(request):
+    if request.method == 'POST':
+        form = RoomForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('admin-panel')
+    else:
+        form = RoomForm()
+    return render(request, 'add_room.html', {'form': form})

@@ -44,10 +44,10 @@
             {% endif %}
         </div>
         <div>
-            <label for="id_image_url">Image URL:</label>
-            {{ form.image_url }}
-            {% if form.image_url.errors %}
-                <div class="error">{{ form.image_url.errors }}</div>
+            <label for="id_image">Image:</label>
+            {{ form.image }}
+            {% if form.image.errors %}
+                <div class="error">{{ form.image.errors }}</div>
             {% endif %}
         </div>
         <!-- Add any additional fields here -->

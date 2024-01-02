@@ -7,4 +7,5 @@ urlpatterns = [
     path('rooms/', views.RoomList.as_view(), name='room-list'),
     path('add-hotel/', views.add_hotel, name='add-hotel'),
     path('add-room-type/', views.add_room_type, name='add-room-type'),
+    path('add-room/', views.add_room, name='add-room'),
 ]

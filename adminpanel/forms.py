@@ -12,3 +12,8 @@ class RoomTypeForm(forms.ModelForm):
     class Meta:
         model = RoomType
         fields = '__all__'
+
+class RoomForm(forms.ModelForm):
+    class Meta:
+        model = Room
+        fields = '__all__'
