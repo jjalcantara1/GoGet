@@ -5,7 +5,8 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('adminpanel.urls')),  # Include your app's URLs here
+    path('api/', include('adminpanel.urls')),
+    path('contact/', include('contact.urls')),  # Include your app's URLs here
 ]
 
 if settings.DEBUG:

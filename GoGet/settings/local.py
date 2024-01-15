@@ -28,7 +28,6 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
-# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -41,10 +40,10 @@ INSTALLED_APPS = [
     'adminpanel',
     'corsheaders',
     'rest_framework',
+    'contact',
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -52,10 +51,15 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
+REST_FRAMEWORK = {'DEFAULT_PERMISSIONS_CLASSES':[
+'rest_framework.permission.AllowAny'
+]}
+
 ROOT_URLCONF = 'GoGet.urls'
+CORS_ORIGIN_ALLOW_ALL = True
 
 TEMPLATES = [
     {
@@ -139,3 +143,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 CORS_ALLOW_ALL_ORIGINS = True
+
+# Contact Sending Email Settings
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+DEFAULT_FROM_EMAIL = 'gogethotel@gmail.com'
+CONTACT_EMAIL = 'gogethotel@gmail.com'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'gogethotel@gmail.com'
+EMAIL_HOST_PASSWORD = 'lkfoxleggjwmxotv'
+EMAIL_USE_TLS = True
+# EMAIL_USE_SSL = False
+# Application definition
