@@ -40,8 +40,7 @@ class RoomTypeSerializer(serializers.ModelSerializer):
         return instance
 
 class RoomSerializer(serializers.ModelSerializer):
-    room_type = RoomTypeSerializer()
     class Meta:
         model = Room
-        fields = ['id', 'number', 'is_available', 'is_smoking', 'is_pet_friendly', 'room_type']
+        fields = ['id', 'number', 'is_available', 'is_smoking', 'is_pet_friendly']
 

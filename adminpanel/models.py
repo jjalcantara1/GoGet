@@ -21,6 +21,8 @@ class RoomType(models.Model):
     total_rooms = models.IntegerField(default=0)
     image = models.ImageField(upload_to='images/', blank=True, null=True)
 
+
+
     def __str__(self):
         return self.name
 

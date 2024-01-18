@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import HotelViewSet, RoomTypeViewSet, RoomViewSet
+from .views import *
 
 router = DefaultRouter()
 router.register(r'hotels', HotelViewSet)
@@ -9,4 +9,8 @@ router.register(r'rooms', RoomViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('roomtypes/<int:room_type_id>/rooms/', get_rooms_by_type, name='get_rooms_by_type'),
+    path('rooms/', add_room, name='add_room'),
+    path('rooms/<int:room_id>/', edit_room, name='edit_room'),
+    path('rooms/<int:room_id>/delete/', delete_room, name='delete_room'),
 ]
