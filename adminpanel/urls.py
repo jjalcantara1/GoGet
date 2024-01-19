@@ -1,6 +1,8 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import *
+from rest_framework_simplejwt.views import TokenObtainPairView
+
 
 router = DefaultRouter()
 router.register(r'hotels', HotelViewSet)
@@ -13,4 +15,6 @@ urlpatterns = [
     path('rooms/', add_room, name='add_room'),
     path('rooms/<int:room_id>/', edit_room, name='edit_room'),
     path('rooms/<int:room_id>/delete/', delete_room, name='delete_room'),
+    path('login/', TokenObtainPairView.as_view(), name='login'),
+
 ]

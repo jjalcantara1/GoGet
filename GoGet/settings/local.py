@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'adminpanel',
     'corsheaders',
     'rest_framework',
+    'rest_framework_simplejwt'
     'contact',
 ]
 
@@ -55,7 +56,8 @@ MIDDLEWARE = [
 ]
 
 REST_FRAMEWORK = {'DEFAULT_PERMISSIONS_CLASSES':[
-'rest_framework.permission.AllowAny'
+'rest_framework.permission.AllowAny',
+'rest_framework_simplejwt.authentication.JWTAuthentication',
 ]}
 
 ROOT_URLCONF = 'GoGet.urls'

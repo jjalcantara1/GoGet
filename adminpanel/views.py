@@ -5,6 +5,9 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from .models import Hotel, RoomType, Room
 from .serializers import HotelSerializer, RoomTypeSerializer, RoomSerializer
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
+
 
 class HotelViewSet(viewsets.ModelViewSet):
     queryset = Hotel.objects.all()
@@ -58,3 +61,21 @@ def delete_room(request, room_id):
     room = get_object_or_404(Room, pk=room_id)
     room.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
+
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+
+        # Add custom claims
+        token['id'] = user._id
+        token['email'] = user.email
+        # ...
+
+        return token
+
+
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
+
