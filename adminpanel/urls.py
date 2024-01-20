@@ -15,6 +15,6 @@ urlpatterns = [
     path('rooms/', add_room, name='add_room'),
     path('rooms/<int:room_id>/', edit_room, name='edit_room'),
     path('rooms/<int:room_id>/delete/', delete_room, name='delete_room'),
-    path('login/', TokenObtainPairView.as_view(), name='login'),
+    path('login/', MyTokenObtainPairView.as_view(), name='login'),
 
 ]

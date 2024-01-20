@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'adminpanel',
     'corsheaders',
     'rest_framework',
-    'rest_framework_simplejwt'
+    'rest_framework_simplejwt',
     'contact',
 ]
 
@@ -61,7 +61,6 @@ REST_FRAMEWORK = {'DEFAULT_PERMISSIONS_CLASSES':[
 ]}
 
 ROOT_URLCONF = 'GoGet.urls'
-CORS_ORIGIN_ALLOW_ALL = True
 
 TEMPLATES = [
     {
