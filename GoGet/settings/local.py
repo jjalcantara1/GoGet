@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'adminpanel',
     'corsheaders',
     'rest_framework',
-    'rest_framework_simplejwt'
+    'rest_framework_simplejwt',
     'contact',
 ]
 
