@@ -8,6 +8,7 @@ urlpatterns = [
     path('api/', include('adminpanel.urls')),
     path('contact/', include('contact.urls')),
     path('api/', include('filters.urls')),
+    path('book/', include('book.urls')),
 ]
 
 if settings.DEBUG:
