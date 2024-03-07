@@ -7,11 +7,11 @@ from .serializers import OrderSerializer
 @api_view(['POST'])
 def CreateOrder(request):
         data = request.data
-        print(data['contact_number'])
+        print(data['contact_no'])
         order = Order.objects.create(
                 name = data['name'],
                 email = data['email'],
-                contact_number = data['contact_number']
+                contact_no= data['contact_no']
                 )
         serializer = OrderSerializer(order, many=False)
         return Response({'message: success'})
