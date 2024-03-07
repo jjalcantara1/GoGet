@@ -6,5 +6,5 @@ from django.contrib import admin
 from contact.views import *
 
 urlpatterns = [
-    path('', ContactView.as_view(), name = "Contact Us"),
+    path('contact/', ContactView.as_view(), name = "Contact Us"),
 ]
