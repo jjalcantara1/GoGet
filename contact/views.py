@@ -13,11 +13,10 @@ from django.conf import settings
 # Create your views here.
 
 def send_contact_email(data):
-    subject = 'Query'
+    subject = data['subject']
     message = f'''
     Name: {data['name']}
     Email: {data['email']}
-    Subject: {data['subject']}
     Message: {data['message']}
     '''
 
