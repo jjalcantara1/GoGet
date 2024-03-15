@@ -27,23 +27,21 @@ class BookingAPIView(APIView):
 def available_room_types(request):
     start_date = request.query_params.get('start_date')
     end_date = request.query_params.get('end_date')
+    guest_count = request.query_params.get('guest_count', 1)
 
     try:
         # Convert string dates to datetime objects
         start_date = datetime.strptime(start_date, '%Y-%m-%d').replace(hour=14, minute=0)
         end_date = datetime.strptime(end_date, '%Y-%m-%d').replace(hour=12, minute=0)
+        guest_count = int(guest_count)  # Convert guest_count to an integer
 
-        # Get all RoomTypes
-        room_types = RoomType.objects.all()
-        available_room_types = []
-
-        for room_type in room_types:
-            if room_type.available_rooms(start_date, end_date).exists():
-                available_room_types.append(room_type)
+        available_room_types = [
+            room_type for room_type in RoomType.objects.all()
+            if room_type.available_rooms(start_date, end_date, guest_count).exists()
+        ]
 
         serializer = RoomTypeSerializer(available_room_types, many=True)
         return Response(serializer.data)
     except ValueError as e:
-        # Handle the exception
         return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
