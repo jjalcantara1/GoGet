@@ -29,7 +29,7 @@ def send_contact_email(data):
     )
 
 
-class ContactView(APIView):
+class ContactView(APIView   ):
     serializer_class = ContactSerializer
 
     def post(self, request):
