@@ -25,29 +25,22 @@ class RoomType(models.Model):
     def __str__(self):
         return self.name
 
-    # In your RoomType model
-    # In your RoomType model
-    def available_rooms(self, check_in, check_out, guest_count=1):
-        # Convert guest_count to int in case it's passed as a string
-        guest_count = int(guest_count)
+    def available_rooms(self, start_date, end_date, guest_count=1):
+        guest_count = int(guest_count)  # Ensure guest_count is an integer
 
-        # First, check if the RoomType itself has enough capacity
+        # If room type capacity is less than guest_count, return no rooms
         if self.capacity < guest_count:
-            # If not enough capacity, return an empty queryset
-            return Room.objects.none()
+            return self.room_set.none()
 
-        # Get all rooms of this type
-        all_rooms = self.room_set.all()
-
-        # Get IDs of booked rooms in the range
+        # Get all rooms of this type that are not booked
         booked_room_ids = Booking.objects.filter(
-            room__room_type=self,  # Filter bookings by this RoomType
-            start_date__lt=check_out,
-            end_date__gt=check_in
+            room__room_type=self,
+            start_date__lt=end_date,
+            end_date__gt=start_date
         ).values_list('room', flat=True)
 
-        # Exclude the booked rooms from the available rooms
-        available_rooms = all_rooms.exclude(id__in=booked_room_ids)
+        available_rooms = self.room_set.exclude(id__in=booked_room_ids)
+
         return available_rooms
 
 

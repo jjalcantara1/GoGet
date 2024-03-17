@@ -7,6 +7,8 @@ from .serializers import BookingSerializer
 from adminpanel.models import RoomType, Booking
 from adminpanel.serializers import RoomTypeSerializer
 from datetime import datetime
+
+
 class BookingAPIView(APIView):
     def post(self, request):
         serializer = BookingSerializer(data=request.data)
@@ -27,21 +29,21 @@ class BookingAPIView(APIView):
 def available_room_types(request):
     start_date = request.query_params.get('start_date')
     end_date = request.query_params.get('end_date')
-    guest_count = request.query_params.get('guest_count', 1)
+    guest_counts = request.query_params.getlist('guest_count')  # Expecting a list of guest counts
 
-    try:
-        # Convert string dates to datetime objects
-        start_date = datetime.strptime(start_date, '%Y-%m-%d').replace(hour=14, minute=0)
-        end_date = datetime.strptime(end_date, '%Y-%m-%d').replace(hour=12, minute=0)
-        guest_count = int(guest_count)  # Convert guest_count to an integer
+    # Assuming guest_counts is a list of integers like ['2', '3']
+    guest_counts = [int(count) for count in guest_counts]
 
-        available_room_types = [
-            room_type for room_type in RoomType.objects.all()
-            if room_type.available_rooms(start_date, end_date, guest_count).exists()
-        ]
+    # Logic to get room types for each guest count
+    available_room_types = []
+    for count in guest_counts:
+        # Filter RoomType based on available rooms and capacity
+        room_types = RoomType.objects.filter(
+            id__in=[room_type.id for room_type in RoomType.objects.all() if
+                    room_type.available_rooms(start_date, end_date, count).exists()]
+        )
+        serialized = RoomTypeSerializer(room_types, many=True)
+        available_room_types.append(serialized.data)
 
-        serializer = RoomTypeSerializer(available_room_types, many=True)
-        return Response(serializer.data)
-    except ValueError as e:
-        return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
-
+    flat_list = [item for sublist in available_room_types for item in sublist]
+    return Response(flat_list)
