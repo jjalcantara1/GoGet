@@ -6,3 +6,4 @@ from .models import *
 admin.site.register(Hotel)
 admin.site.register(RoomType)
 admin.site.register(Room)
+
