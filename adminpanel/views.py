@@ -1,3 +1,4 @@
+import logging
 from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
 from rest_framework import status
@@ -36,14 +37,23 @@ def get_rooms_by_type(request, room_type_id):
     serializer = RoomSerializer(rooms, many=True)
     return Response(serializer.data)
 
+
+logger = logging.getLogger(__name__)
+
+
 @api_view(['POST'])
-# @permission_classes([permissions.IsAuthenticated])  # Set permissions as needed
 def add_room(request):
+    logger.info(f"Received data for new room: {request.data}")
+
     serializer = RoomSerializer(data=request.data)
     if serializer.is_valid():
-        serializer.save()
+        room = serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        errors = serializer.errors
+        logger.error(f"Error when trying to create a room: {errors}")
+        return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['PUT'])
 # @permission_classes([permissions.IsAuthenticated])  # Set permissions as needed

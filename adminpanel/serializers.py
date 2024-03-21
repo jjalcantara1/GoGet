@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from .models import Hotel, RoomType, Room
 
@@ -49,7 +50,19 @@ class RoomTypeSerializer(serializers.ModelSerializer):
         return obj.has_smoking_room()
 
 class RoomSerializer(serializers.ModelSerializer):
+    room_type_id = serializers.IntegerField(write_only=True)
+
     class Meta:
         model = Room
-        fields = ['id', 'number', 'is_available', 'is_smoking', 'is_pet_friendly']
+        fields = ['id', 'number', 'is_available', 'is_smoking', 'is_pet_friendly', 'room_type_id']
+
+    def create(self, validated_data):
+        room_type_id = validated_data.pop('room_type_id')
+        room_type = get_object_or_404(RoomType, id=room_type_id)
+        return Room.objects.create(room_type=room_type, **validated_data)
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['room_type_id'] = instance.room_type_id
+        return representation
 
