@@ -21,6 +21,9 @@ class HotelSerializer(serializers.ModelSerializer):
         return instance
 
 class RoomTypeSerializer(serializers.ModelSerializer):
+    is_pet_friendly = serializers.SerializerMethodField()
+    is_smoking = serializers.SerializerMethodField()
+
     class Meta:
         model = RoomType
         fields = '__all__'
@@ -38,6 +41,12 @@ class RoomTypeSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
         instance.save()
         return instance
+
+    def get_is_pet_friendly(self, obj):
+        return obj.has_pet_friendly()
+
+    def get_is_smoking(self, obj):
+        return obj.has_smoking_room()
 
 class RoomSerializer(serializers.ModelSerializer):
     class Meta:

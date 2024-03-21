@@ -43,6 +43,12 @@ class RoomType(models.Model):
 
         return available_rooms
 
+    def has_pet_friendly(self):
+        return self.room_set.filter(is_available=True, is_pet_friendly=True).exists()
+
+    def has_smoking_room(self):
+        return self.room_set.filter(is_available=True, is_smoking=True).exists()
+
 
 class Room(models.Model):
     room_type = models.ForeignKey(RoomType, on_delete=models.CASCADE)
