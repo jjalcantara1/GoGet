@@ -20,10 +20,4 @@ class RedeemPromoCode(APIView):
         except Promo.DoesNotExist:
             return Response({"error": "Invalid promo code"}, status=status.HTTP_400_BAD_REQUEST)
 
-        if promo.times_redeemed < promo.max_redemptions:
-            promo.times_redeemed += 1
-            promo.save()
-            return Response({"discount": promo.discount}, status=status.HTTP_200_OK)
-        else:
-            return Response({"error": "Promo code has reached its maximum redemption limit"},
-                            status=status.HTTP_400_BAD_REQUEST)
+        return Response({"discount": promo.discount}, status=status.HTTP_200_OK if promo.discount else status.HTTP_400_BAD_REQUEST)

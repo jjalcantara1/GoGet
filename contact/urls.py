@@ -7,4 +7,6 @@ from contact.views import *
 
 urlpatterns = [
     path('contact/', ContactView.as_view(), name = "Contact Us"),
+    path('contacts/', ContactListView.as_view(), name="Contact Us"),
+    path('contacts/<int:pk>/', ContactDetailView.as_view(), name='contact-detail'),
 ]

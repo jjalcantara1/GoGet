@@ -8,9 +8,20 @@ from rest_framework.response import Response
 from .serializer import *
 from django.core.mail import send_mail
 from django.conf import settings
+from rest_framework import generics
 
 
 # Create your views here.
+
+class ContactListView(generics.ListAPIView):
+    queryset = Contact.objects.all()
+    serializer_class = ContactSerializer
+
+
+class ContactDetailView(generics.RetrieveAPIView):
+    queryset = Contact.objects.all()
+    serializer_class = ContactSerializer
+
 
 def send_contact_email(data):
     subject = data['subject']
@@ -29,7 +40,7 @@ def send_contact_email(data):
     )
 
 
-class ContactView(APIView   ):
+class ContactView(APIView):
     serializer_class = ContactSerializer
 
     def post(self, request):
