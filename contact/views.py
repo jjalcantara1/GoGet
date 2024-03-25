@@ -30,6 +30,7 @@ def send_contact_email(data):
     message = f'''
     Name: {data['name']}
     Email: {data['email']}
+    Subject: {data['subject']}
     Message: {data['message']}
     '''
 
@@ -53,7 +54,8 @@ class ContactView(APIView):
             # Send contact email
             email = EmailMessage(
                 subject=serializer.validated_data['subject'],
-                body=serializer.validated_data['message'],
+                body=f"Name: {serializer.validated_data['name']}\n"
+                     f"{serializer.validated_data['message']}",
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 to=[settings.CONTACT_EMAIL],  # Ensure this is a list or tuple
                 reply_to=[serializer.validated_data['email']],  # Sender's address
