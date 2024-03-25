@@ -1,15 +1,17 @@
 import output
-from django.shortcuts import render
-from rest_framework.views import APIView
-
 from GoGet import settings
 from .models import *
-from rest_framework.response import Response
 from .serializer import *
+
+from django.shortcuts import render
 from django.core.mail import send_mail
 from django.conf import settings
-from rest_framework import generics
+from django.core.mail import EmailMessage
 
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import generics
+from rest_framework import status
 
 # Create your views here.
 
@@ -43,12 +45,20 @@ def send_contact_email(data):
 class ContactView(APIView):
     serializer_class = ContactSerializer
 
-    def post(self, request):
+    def post(self, request, *args, **kwargs):
         serializer = ContactSerializer(data=request.data)
-        # subject = models.Contact.subject
+        if serializer.is_valid():
+            contact_message = serializer.save()
 
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            send_contact_email(serializer.validated_data)
+            # Send contact email
+            email = EmailMessage(
+                subject=serializer.validated_data['subject'],
+                body=serializer.validated_data['message'],
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[settings.CONTACT_EMAIL],  # Ensure this is a list or tuple
+                reply_to=[serializer.validated_data['email']],  # Sender's address
+            )
+            email.send(fail_silently=False)
 
-            return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)  # Return success response
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  # Return error response
