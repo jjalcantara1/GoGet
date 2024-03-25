@@ -4,7 +4,7 @@ from rest_framework.response import Response
 
 from adminpanel.models import Booking
 from .models import Order
-from .serializers import OrderSerializer
+from .serializers import *
 from rest_framework import viewsets
 
 
@@ -32,3 +32,7 @@ def CreateOrder(request):
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
+
+class BookingViewSet(viewsets.ModelViewSet):
+    queryset = Booking.objects.all()
+    serializer_class = BookingSerializer
