@@ -12,13 +12,7 @@ from rest_framework import viewsets
 def CreateOrder(request):
         data = request.data
 
-        try:
-                booking = Booking.objects.get(id=data['booking_id'])
-        except Booking.DoesNotExist:
-                return Response({'error': 'Booking not found'}, status=404)
-
         order = Order.objects.create(
-                booking=booking,
                 name=data['name'],
                 email=data['email'],
                 contact_no=data['contact_no']
