@@ -4,8 +4,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Hotel, RoomType, Room
-from .serializers import HotelSerializer, RoomTypeSerializer, RoomSerializer
+from .models import Hotel, RoomType, Room, Booking
+from .serializers import HotelSerializer, RoomTypeSerializer, RoomSerializer, GuestLogSerializer
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 
@@ -96,3 +96,10 @@ def get_available_rooms(request, room_type_id, start_date, end_date):
         available_rooms = room_type.available_rooms(start_date, end_date)
         available_room_ids = list(available_rooms.values_list('id', flat=True))
         return Response(available_room_ids)
+
+@api_view(['GET'])
+def guest_log(request):
+    # You can add filtering by date range if needed
+    bookings = Booking.objects.all()
+    serializer = GuestLogSerializer(bookings, many=True)
+    return Response(serializer.data)

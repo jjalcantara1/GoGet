@@ -70,10 +70,19 @@ def create_default_order():
     return order.id
 
 class Booking(models.Model):
+    STATUS_CHOICES = (
+        ('reserved', 'Reserved'),
+        ('checked_in', 'Checked In'),
+        ('checked_out', 'Checked Out'),
+        # Add more status choices as needed
+    )
+
     order = models.ForeignKey(Order, related_name='bookings', on_delete=models.CASCADE, default=create_default_order)
-    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='bookings')
+    room = models.ForeignKey(Room, related_name='bookings', on_delete=models.CASCADE)
     start_date = models.DateField()
     end_date = models.DateField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='reserved')
+
 
 
     def __str__(self):
