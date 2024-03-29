@@ -159,3 +159,14 @@ EMAIL_HOST_PASSWORD = 'lkfoxleggjwmxotv'
 EMAIL_USE_TLS = True
 # EMAIL_USE_SSL = False
 # Application definition
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    # Add other origins as needed
+]
+
+# To allow specific HTTP methods
+CORS_ALLOW_METHODS = [
+    "GET",
+    "POST",
+    # Add other methods as needed
+]

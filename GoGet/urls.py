@@ -10,7 +10,7 @@ urlpatterns = [
     path('api/', include('adminpanel.urls')),
     path('api/', include('contact.urls')),
     path('api/', include('filters.urls')),
-    path('book/', include('book.urls')),
+    path('api/', include('book.urls')),
     path('api/', include('promo.urls')),
 ]
 

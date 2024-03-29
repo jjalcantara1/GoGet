@@ -1,7 +1,11 @@
+from datetime import datetime
+
 from django.db import models
+from django.shortcuts import get_object_or_404
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
-
-# Create your models here.
+from book.models import Order
 
 class Hotel(models.Model):
     name = models.CharField(max_length=100)
@@ -61,8 +65,12 @@ class Room(models.Model):
         return f"{self.room_type.name} - Room {self.number}"
 
     pass
+def create_default_order():
+    order, _ = Order.objects.get_or_create(name='Default', email='default@example.com', contact_no='1234567890', created_at='2022-01-01 00:00:00')
+    return order.id
 
 class Booking(models.Model):
+    order = models.ForeignKey(Order, related_name='bookings', on_delete=models.CASCADE, default=create_default_order)
     room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='bookings')
     start_date = models.DateField()
     end_date = models.DateField()

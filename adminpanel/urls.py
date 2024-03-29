@@ -16,5 +16,7 @@ urlpatterns = [
     path('rooms/<int:room_id>/', edit_room, name='edit_room'),
     path('rooms/<int:room_id>/delete/', delete_room, name='delete_room'),
     path('login/', MyTokenObtainPairView.as_view(), name='login'),
+    path('roomtypes/<int:room_type_id>/<start_date>/<end_date>/available-rooms/', get_available_rooms,
+         name='get_available_rooms'),
 
 ]

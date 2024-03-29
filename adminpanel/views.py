@@ -89,3 +89,10 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
 
+@api_view(['GET'])
+def get_available_rooms(request, room_type_id, start_date, end_date):
+        # Perform your date validation and conversion here as needed
+        room_type = get_object_or_404(RoomType, id=room_type_id)
+        available_rooms = room_type.available_rooms(start_date, end_date)
+        available_room_ids = list(available_rooms.values_list('id', flat=True))
+        return Response(available_room_ids)
