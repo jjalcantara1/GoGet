@@ -44,31 +44,30 @@ logger = logging.getLogger(__name__)
 def create_order(request):
     data = request.data
     order_serializer = OrderSerializer(data=data.get('order'))
+
     if order_serializer.is_valid():
         order = order_serializer.save()
         booking_data_list = data.get('bookings')
 
         for booking_data in booking_data_list:
-            # You should check here if the room_id in booking_data actually exists
-            # and is available for the given dates.
-            room = get_object_or_404(Room, id=booking_data.get('room_id'), is_available=True)
+            room_id = booking_data.get('room_id')
+            start_date = booking_data.get('start_date')
+            end_date = booking_data.get('end_date')
 
-            # Check if the room is actually available for the dates requested
-            if room.bookings.filter(start_date__lt=booking_data.get('end_date'),
-                                    end_date__gt=booking_data.get('start_date')).exists():
+            # Check if the room is available
+            room = get_object_or_404(Room, id=room_id)
+            overlapping_bookings = room.bookings.filter(start_date__lt=end_date, end_date__gt=start_date)
+
+            if not overlapping_bookings.exists():
+                Booking.objects.create(
+                    room=room,
+                    order=order,
+                    start_date=start_date,
+                    end_date=end_date
+                )
+            else:
                 transaction.set_rollback(True)
                 return Response({'error': f"Room {room.id} not available for the given dates"}, status=400)
-
-            # Create a booking for the room and order
-            Booking.objects.create(
-                room=room,
-                order=order,
-                start_date=booking_data['start_date'],
-                end_date=booking_data['end_date']
-            )
-            # Mark the room as unavailable if necessary
-            room.is_available = False
-            room.save()
 
         return Response(OrderSerializer(order).data, status=201)
     else:

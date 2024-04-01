@@ -32,11 +32,11 @@ class RoomType(models.Model):
     def available_rooms(self, start_date, end_date, guest_count=1):
         guest_count = int(guest_count)  # Ensure guest_count is an integer
 
-        # If room type capacity is less than guest_count, return no rooms
+        # If room type capacity is less than guest count, return no rooms
         if self.capacity < guest_count:
             return self.room_set.none()
 
-        # Get all rooms of this type that are not booked
+        # Get all rooms of this type that are not booked during the requested dates
         booked_room_ids = Booking.objects.filter(
             room__room_type=self,
             start_date__lt=end_date,
@@ -44,7 +44,6 @@ class RoomType(models.Model):
         ).values_list('room', flat=True)
 
         available_rooms = self.room_set.exclude(id__in=booked_room_ids)
-
         return available_rooms
 
     def has_pet_friendly(self):
