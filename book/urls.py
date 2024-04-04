@@ -10,5 +10,6 @@ urlpatterns = [
     # path('order', CreateOrder, name = 'order'),
     path('', include(router.urls)),
     path('create-order/', create_order, name='create-order'),
+    path('order-details/<int:order_id>/', get_order_details, name='get-order-details'),
 
 ]

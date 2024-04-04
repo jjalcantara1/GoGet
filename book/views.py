@@ -85,3 +85,14 @@ def create_order(request):
         return Response(OrderSerializer(order).data, status=201)
     else:
         return Response(order_serializer.errors, status=400)
+
+@api_view(['GET'])
+def get_order_details(request, order_id):
+    try:
+        order = Order.objects.get(id=order_id)
+        serializer = OrderSerializer(order)
+        logging.info(f"Sending total_cost to frontend: {order.total_cost}")
+        return Response(serializer.data)
+    except Order.DoesNotExist:
+        return Response({'error': 'Order not found'}, status=404)
+
