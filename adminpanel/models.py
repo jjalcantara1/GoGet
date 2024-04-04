@@ -73,6 +73,7 @@ class Booking(models.Model):
         ('reserved', 'Reserved'),
         ('checked_in', 'Checked In'),
         ('checked_out', 'Checked Out'),
+        ('pending', 'Pending'),
         # Add more status choices as needed
     )
 
@@ -80,7 +81,7 @@ class Booking(models.Model):
     room = models.ForeignKey(Room, related_name='bookings', on_delete=models.CASCADE)
     start_date = models.DateField()
     end_date = models.DateField()
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='reserved')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
 
 
 

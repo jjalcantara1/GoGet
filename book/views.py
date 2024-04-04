@@ -96,3 +96,15 @@ def get_order_details(request, order_id):
     except Order.DoesNotExist:
         return Response({'error': 'Order not found'}, status=404)
 
+@api_view(['POST'])
+@transaction.atomic
+def mark_order_paid(request):
+    order_id = request.data.get('orderID')
+    order = get_object_or_404(Order, id=order_id)
+    order.is_paid = True
+    order.save()
+
+    # Optionally, update any bookings to 'reserved' status if they were 'pending'
+    order.bookings.update(status='reserved')
+
+    return Response({'status': 'Order marked as paid'}, status=200)
