@@ -52,14 +52,25 @@ def create_order(request):
         order = order_serializer.save()
         booking_data_list = data.get('bookings')
         total_cost = Decimal("0.00")  # Initialize total cost as Decimal
+        today = datetime.today().date()  # Get today's date
 
         for booking_data in booking_data_list:
             room_id = booking_data.get('room_id')
-            start_date = booking_data.get('start_date')
-            end_date = booking_data.get('end_date')
+            start_date_str = booking_data.get('start_date')
+            end_date_str = booking_data.get('end_date')
+
+            # Parse the dates from strings to date objects
+            start_date = datetime.strptime(start_date_str, "%Y-%m-%d").date()
+            end_date = datetime.strptime(end_date_str, "%Y-%m-%d").date()
+
+            # Check if the dates are in the past
+            if start_date < today or end_date <= today:
+                return Response({
+                    'error': 'Cannot book dates in the past.'
+                }, status=400)
 
             # Calculate the number of nights
-            num_nights = (datetime.strptime(end_date, "%Y-%m-%d") - datetime.strptime(start_date, "%Y-%m-%d")).days - 1
+            num_nights = (end_date - start_date).days - 1
             num_nights = Decimal(num_nights)  # Ensure num_nights is a Decimal
 
             room = get_object_or_404(Room, id=room_id)
@@ -90,11 +101,12 @@ def create_order(request):
 def get_order_details(request, order_id):
     try:
         order = Order.objects.get(id=order_id)
+        # Now using the updated serializer that includes booking and room details
         serializer = OrderSerializer(order)
-        logging.info(f"Sending total_cost to frontend: {order.total_cost}")
         return Response(serializer.data)
     except Order.DoesNotExist:
         return Response({'error': 'Order not found'}, status=404)
+
 
 @api_view(['POST'])
 @transaction.atomic
