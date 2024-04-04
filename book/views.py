@@ -9,6 +9,7 @@ from .models import Order
 from .serializers import OrderSerializer
 from rest_framework import viewsets
 import logging
+from datetime import datetime
 
 
 # @api_view(['POST'])
@@ -48,26 +49,35 @@ def create_order(request):
     if order_serializer.is_valid():
         order = order_serializer.save()
         booking_data_list = data.get('bookings')
+        total_cost = 0.00  # Initialize total cost
 
         for booking_data in booking_data_list:
             room_id = booking_data.get('room_id')
             start_date = booking_data.get('start_date')
             end_date = booking_data.get('end_date')
 
-            # Check if the room is available
+            # Calculate the number of nights
+            num_nights = (datetime.strptime(end_date, "%Y-%m-%d") - datetime.strptime(start_date, "%Y-%m-%d")).days - 1
+
             room = get_object_or_404(Room, id=room_id)
             overlapping_bookings = room.bookings.filter(start_date__lt=end_date, end_date__gt=start_date)
 
             if not overlapping_bookings.exists():
-                Booking.objects.create(
+                booking = Booking.objects.create(
                     room=room,
                     order=order,
                     start_date=start_date,
                     end_date=end_date
                 )
+                # Calculate the total cost for this booking and add to the total_cost
+                total_cost += booking.room.room_type.price * num_nights
             else:
                 transaction.set_rollback(True)
                 return Response({'error': f"Room {room.id} not available for the given dates"}, status=400)
+
+        # Update the order with the calculated total cost
+        order.total_cost = total_cost
+        order.save()
 
         return Response(OrderSerializer(order).data, status=201)
     else:
