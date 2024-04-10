@@ -5,7 +5,8 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Hotel, RoomType, Room, Booking, SurchargeRates
-from .serializers import HotelSerializer, RoomTypeSerializer, RoomSerializer, GuestLogSerializer
+from .serializers import HotelSerializer, RoomTypeSerializer, RoomSerializer, GuestLogSerializer, \
+    SurchargeRatesSerializer
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 
@@ -114,3 +115,12 @@ def get_surcharge_rates(request):
             'smoking_surcharge': rates.smoking_surcharge
         })
     return Response({'error': 'Surcharge rates not found'}, status=404)
+
+@api_view(['PUT'])
+def update_surcharge_rates(request):
+    rates = SurchargeRates.objects.first()
+    serializer = SurchargeRatesSerializer(rates, data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors, status=400)

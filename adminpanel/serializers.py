@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-from .models import Hotel, RoomType, Room, Booking
+from .models import Hotel, RoomType, Room, Booking, SurchargeRates
 
 
 class HotelSerializer(serializers.ModelSerializer):
@@ -80,3 +80,8 @@ class GuestLogSerializer(serializers.ModelSerializer):
     def get_status(self, obj):
         # Assuming you have a method to get the status or a field in Booking model
         return obj.get_status_display()
+
+class SurchargeRatesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SurchargeRates
+        fields = ['pet_friendly_surcharge', 'smoking_surcharge']

@@ -20,5 +20,6 @@ urlpatterns = [
          name='get_available_rooms'),
     path('guest-log/', guest_log, name='guest_log'),
     path('surcharge-rates/', get_surcharge_rates, name='get_surcharge_rates'),
+    path('surcharge-rates/update/', update_surcharge_rates, name='update-surcharge-rates'),
 
 ]
