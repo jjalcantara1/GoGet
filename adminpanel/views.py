@@ -1,12 +1,14 @@
+from django.http import Http404
 import logging
-from rest_framework import viewsets
+from rest_framework import viewsets, status
+from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
-from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+
+from filters.serializers import BookingSerializer
 from .models import Hotel, RoomType, Room, Booking, SurchargeRates
-from .serializers import HotelSerializer, RoomTypeSerializer, RoomSerializer, GuestLogSerializer, \
-    SurchargeRatesSerializer
+from .serializers import HotelSerializer, RoomTypeSerializer, RoomSerializer, GuestLogSerializer, SurchargeRatesSerializer, StatusChoiceSerializer
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 
@@ -124,3 +126,54 @@ def update_surcharge_rates(request):
         serializer.save()
         return Response(serializer.data)
     return Response(serializer.errors, status=400)
+
+class StatusChoicesView(APIView):
+    def get(self, request):
+        status_choices = Booking.STATUS_CHOICES
+        serializer = StatusChoiceSerializer(
+            [{'value': choice[0], 'display': choice[1]} for choice in status_choices],
+            many=True
+        )
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class BookingViewSet(viewsets.ModelViewSet):
+    queryset = Booking.objects.all()
+    serializer_class = BookingSerializer
+
+@api_view(['POST'])
+def add_entry(request):
+    if request.method == 'POST':
+        serializer = BookingSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['PATCH'])
+def update_entry(request, id):
+    try:
+        booking = Booking.objects.get(id=id)
+    except Booking.DoesNotExist:
+        print(f"Booking with ID {id} does not exist")
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'PATCH':
+        serializer = BookingSerializer(booking, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['DELETE'])
+def delete_entry(request, id):
+    try:
+        booking = Booking.objects.get(id=id)
+    except Booking.DoesNotExist:
+        print(f"Booking with ID {id} does not exist")
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    
+    if request.method == 'DELETE':
+        booking.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)

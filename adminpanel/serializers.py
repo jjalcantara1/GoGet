@@ -75,7 +75,7 @@ class GuestLogSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Booking
-        fields = ('start_date', 'end_date', 'name', 'room_number', 'room_type', 'status')
+        fields = ('id', 'start_date', 'end_date', 'name', 'room_number', 'room_type', 'status')
 
     def get_status(self, obj):
         # Assuming you have a method to get the status or a field in Booking model
@@ -85,3 +85,16 @@ class SurchargeRatesSerializer(serializers.ModelSerializer):
     class Meta:
         model = SurchargeRates
         fields = ['pet_friendly_surcharge', 'smoking_surcharge']
+
+class StatusChoiceSerializer(serializers.Serializer):
+    value = serializers.CharField()
+    display = serializers.CharField()
+
+    def create(self, validated_data):
+        pass
+
+    def update(self, instance, validated_data):
+        pass
+
+    class Meta:
+        fields = ('value', 'display')
