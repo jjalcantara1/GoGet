@@ -19,5 +19,6 @@ urlpatterns = [
     path('roomtypes/<int:room_type_id>/<start_date>/<end_date>/available-rooms/', get_available_rooms,
          name='get_available_rooms'),
     path('guest-log/', guest_log, name='guest_log'),
+    path('surcharge-rates/', get_surcharge_rates, name='get_surcharge_rates'),
 
 ]

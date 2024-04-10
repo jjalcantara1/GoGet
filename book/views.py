@@ -5,13 +5,14 @@ from django.shortcuts import render, get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from adminpanel.models import Booking, Room
+from adminpanel.models import Booking, Room, SurchargeRates
 from filters.serializers import BookingSerializer
 from .models import Order
 from .serializers import OrderSerializer
 from rest_framework import viewsets
 import logging
 from datetime import datetime
+from django.db.models import Sum, F
 
 
 # @api_view(['POST'])
@@ -54,6 +55,11 @@ def create_order(request):
         total_cost = Decimal("0.00")  # Initialize total cost as Decimal
         today = datetime.today().date()  # Get today's date
 
+        # Fetch surcharge rates
+        surcharge_rates = SurchargeRates.objects.first()  # Assuming there's only one entry
+        pet_friendly_surcharge = surcharge_rates.pet_friendly_surcharge if surcharge_rates else Decimal("100.00")
+        smoking_surcharge = surcharge_rates.smoking_surcharge if surcharge_rates else Decimal("200.00")
+
         for booking_data in booking_data_list:
             room_id = booking_data.get('room_id')
             start_date_str = booking_data.get('start_date')
@@ -69,22 +75,29 @@ def create_order(request):
                     'error': 'Cannot book dates in the past.'
                 }, status=400)
 
-            # Calculate the number of nights
-            num_nights = (end_date - start_date).days - 1
-            num_nights = Decimal(num_nights)  # Ensure num_nights is a Decimal
-
             room = get_object_or_404(Room, id=room_id)
             overlapping_bookings = room.bookings.filter(start_date__lt=end_date, end_date__gt=start_date)
 
             if not overlapping_bookings.exists():
+                # Calculate the number of nights
+                num_nights = (end_date - start_date).days
+                booking_cost = room.room_type.price * Decimal(num_nights)
+
+                # Apply surcharges based on room attributes
+                if room.is_pet_friendly:
+                    booking_cost += pet_friendly_surcharge
+                if room.is_smoking:
+                    booking_cost += smoking_surcharge
+
+                # Create the booking instance
                 Booking.objects.create(
                     room=room,
                     order=order,
                     start_date=start_date,
                     end_date=end_date
                 )
-                # Calculate the total cost for this booking and add to the total_cost
-                total_cost += room.room_type.price * num_nights
+
+                total_cost += booking_cost
             else:
                 transaction.set_rollback(True)
                 return Response({'error': f"Room {room.id} not available for the given dates"}, status=400)
@@ -97,16 +110,37 @@ def create_order(request):
     else:
         return Response(order_serializer.errors, status=400)
 
+
 @api_view(['GET'])
 def get_order_details(request, order_id):
     try:
         order = Order.objects.get(id=order_id)
-        # Now using the updated serializer that includes booking and room details
+
+        surcharge_rates = SurchargeRates.objects.first()
+        pet_friendly_surcharge = surcharge_rates.pet_friendly_surcharge if surcharge_rates else Decimal("100.00")
+        smoking_surcharge = surcharge_rates.smoking_surcharge if surcharge_rates else Decimal("200.00")
+
+        # Calculate days stayed as an integer
+        total_cost = Decimal("0.00")
+        for booking in order.bookings.all():
+            days_stayed = (booking.end_date - booking.start_date).days
+            booking_cost = booking.room.room_type.price * days_stayed
+
+            if booking.room.is_pet_friendly:
+                booking_cost += pet_friendly_surcharge
+            if booking.room.is_smoking:
+                booking_cost += smoking_surcharge
+
+            total_cost += booking_cost
+
+        # Update the order's total cost if necessary
+        order.total_cost = total_cost
+        order.save(update_fields=['total_cost'])
+
         serializer = OrderSerializer(order)
         return Response(serializer.data)
     except Order.DoesNotExist:
         return Response({'error': 'Order not found'}, status=404)
-
 
 @api_view(['POST'])
 @transaction.atomic

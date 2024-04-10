@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Hotel, RoomType, Room, Booking
+from .models import Hotel, RoomType, Room, Booking, SurchargeRates
 from .serializers import HotelSerializer, RoomTypeSerializer, RoomSerializer, GuestLogSerializer
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -103,3 +103,14 @@ def guest_log(request):
     bookings = Booking.objects.all()
     serializer = GuestLogSerializer(bookings, many=True)
     return Response(serializer.data)
+
+
+@api_view(['GET'])
+def get_surcharge_rates(request):
+    rates = SurchargeRates.objects.first()
+    if rates:
+        return Response({
+            'pet_friendly_surcharge': rates.pet_friendly_surcharge,
+            'smoking_surcharge': rates.smoking_surcharge
+        })
+    return Response({'error': 'Surcharge rates not found'}, status=404)

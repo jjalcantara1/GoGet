@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 
 from django.db import models
 from django.shortcuts import get_object_or_404
@@ -6,6 +7,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from book.models import Order
+
 
 class Hotel(models.Model):
     name = models.CharField(max_length=100)
@@ -23,8 +25,6 @@ class RoomType(models.Model):
     capacity = models.IntegerField()
     features = models.CharField(max_length=100)
     image = models.ImageField(upload_to='images/', blank=True, null=True)
-    
-
 
     def __str__(self):
         return self.name
@@ -64,9 +64,13 @@ class Room(models.Model):
         return f"{self.room_type.name} - Room {self.number}"
 
     pass
+
+
 def create_default_order():
-    order, _ = Order.objects.get_or_create(name='Default', email='default@example.com', contact_no='1234567890', created_at='2022-01-01 00:00:00')
+    order, _ = Order.objects.get_or_create(name='Default', email='default@example.com', contact_no='1234567890',
+                                           created_at='2022-01-01 00:00:00')
     return order.id
+
 
 class Booking(models.Model):
     STATUS_CHOICES = (
@@ -83,7 +87,24 @@ class Booking(models.Model):
     end_date = models.DateField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
 
-
-
     def __str__(self):
         return f"Booking for {self.room} from {self.start_date} to {self.end_date}"
+
+
+class SurchargeRates(models.Model):
+    pet_friendly_surcharge = models.DecimalField(max_digits=10, decimal_places=2, default=100.00)
+    smoking_surcharge = models.DecimalField(max_digits=10, decimal_places=2, default=200.00)
+
+    class Meta:
+        verbose_name_plural = "Surcharge Rates"
+
+    def __str__(self):
+        return "Surcharge Rates"
+
+    def get_current_surcharge_rates():
+        rates = SurchargeRates.objects.first()  # Assuming there's only one entry in the database
+        if rates:
+            return rates.pet_friendly_surcharge, rates.smoking_surcharge
+        else:
+            # Default values if no surcharge rates are defined
+            return Decimal("100.00"), Decimal("200.00")
