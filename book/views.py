@@ -13,6 +13,7 @@ from rest_framework import viewsets
 import logging
 from datetime import datetime
 from django.db.models import Sum, F
+from django.views.decorators.csrf import csrf_exempt
 
 
 # @api_view(['POST'])
@@ -42,7 +43,7 @@ class OrderViewSet(viewsets.ModelViewSet):
 
 logger = logging.getLogger(__name__)
 
-
+@csrf_exempt
 @api_view(['POST'])
 @transaction.atomic
 def create_order(request):

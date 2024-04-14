@@ -1,3 +1,4 @@
+from django.db.models import Count, Q
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -47,3 +48,46 @@ def available_room_types(request):
 
     flat_list = [item for sublist in available_room_types for item in sublist]
     return Response(flat_list)
+
+
+@api_view(['GET'])
+def room_types_availability(request):
+    start_date = request.query_params.get('start_date')
+    end_date = request.query_params.get('end_date')
+
+    room_types = RoomType.objects.all().prefetch_related('room_set')
+    conflicting_bookings = Booking.objects.filter(
+        start_date__lt=end_date,
+        end_date__gt=start_date
+    )
+    booked_room_ids = set(conflicting_bookings.values_list('room_id', flat=True))
+
+    available_room_types = []
+    for room_type in room_types:
+        # Dictionary to hold the available rooms organized by category
+        categories_with_rooms = {
+            'standard': {'count': 0, 'availableRoomIds': []},
+            'pet_friendly': {'count': 0, 'availableRoomIds': []},
+            'smoking_friendly': {'count': 0, 'availableRoomIds': []},
+            'both': {'count': 0, 'availableRoomIds': []},
+        }
+
+        # Populate the categories_with_rooms dictionary
+        for room in room_type.room_set.all():
+            if room.id not in booked_room_ids:
+                category = 'both' if room.is_pet_friendly and room.is_smoking else (
+                    'pet_friendly' if room.is_pet_friendly else (
+                        'smoking_friendly' if room.is_smoking else 'standard'
+                    )
+                )
+                categories_with_rooms[category]['count'] += 1
+                categories_with_rooms[category]['availableRoomIds'].append(room.id)
+
+        # Use the serialized data which includes the price and other details
+        room_type_data = RoomTypeSerializer(room_type).data
+        room_type_data['categories'] = categories_with_rooms
+
+        # Add the room type data to the available_room_types list
+        available_room_types.append(room_type_data)
+
+    return Response(available_room_types)
