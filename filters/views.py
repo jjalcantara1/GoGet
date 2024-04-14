@@ -54,6 +54,11 @@ def available_room_types(request):
 def room_types_availability(request):
     start_date = request.query_params.get('start_date')
     end_date = request.query_params.get('end_date')
+    guest_count = request.query_params.get('guest_count')
+    if guest_count:
+        room_types = RoomType.objects.filter(capacity__gte=guest_count)
+    else:
+        room_types = RoomType.objects.all()
 
     room_types = RoomType.objects.all().prefetch_related('room_set')
     conflicting_bookings = Booking.objects.filter(
