@@ -43,7 +43,7 @@ class OrderViewSet(viewsets.ModelViewSet):
 
 logger = logging.getLogger(__name__)
 
-@csrf_exempt
+# @csrf_exempt
 @api_view(['POST'])
 @transaction.atomic
 def create_order(request):
